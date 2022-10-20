@@ -1,0 +1,21 @@
+#navbarNav {
+    font-size: larger;
+    place-content: center;
+}
+
+.navbar {
+    padding: 1.2rem 4rem !important;
+}
+
+.navbar-expand-lg .navbar-collapse {
+    align-self: flex-start;
+}
+
+li.nav-item:hover {
+    border-bottom: 2px solid #c5a491;
+}
+
+.row .NavLink {
+    letter-spacing: 0.1rem;
+    color: #102a42;
+}

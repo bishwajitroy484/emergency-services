@@ -1,0 +1,19 @@
+footer {
+    background: #222;
+    height: 5rem;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    align-items: center;
+}
+
+.container h5 {
+    margin: 0.1rem;
+    font-weight: 400;
+    text-transform: none;
+    line-height: 1.25;
+    color: white;
+}
