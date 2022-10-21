@@ -1,57 +1,19 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import './SignUp.css';
+import SIgn_img from '../SIgn_img'
 
 export default function SignUp() {
   return (
     <>
-    <div className='container my-5 mb-5' style={{'width':'30em'}}>
-        <div>
-            <h1 className='text-center'>Sign Up</h1>
-        </div>
-        <div>
-            <form id="signUpForm">
+    <div className="container mt-3">
+    <section className='d-flex justify-content-between'>
+    <div className="left_data mt-3 p-3" style={{'width':'30em' }}>
+    <h3>Sign Up</h3>
+    <form id="signUpForm">
                 <div className="form-group">
-                    <label htmlFor="firstName">First Name</label>
-                    <input type="text" className="form-control" id="firstName" placeholder="Enter First Name"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="lastName">Last Name</label>
-                    <input type="text" className="form-control" id="lastName" placeholder="Enter Last Name"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="adharNum">Adhar No.</label>
-                    <input type="number" className="form-control" id="lastName" placeholder="Enter Adhar No"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="mobileNum">Mobile No.</label>
-                    <input type="number" className="form-control" id="mobileNum" placeholder="Enter Mobile No"/>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="houseNum">House No.</label>
-                    <input type="number" className="form-control" id="houseNum" placeholder="Enter House No"/>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="street">Street</label>
-                    <input type="text" className="form-control" id="street" placeholder="Enter Street Name"/>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="pinCode">Pin Code</label>
-                    <input type="text" className="form-control" id="pincode" placeholder="Enter Pin code"/>
-                </div>
-
-
-                <div className="row">
-                    <div className="col">
-                    <label htmlFor="city">City</label>
-                      <input type="text" className="form-control" id="city" placeholder="Enter City"/>
-                    </div>
-                <div className="col">
-                    <label htmlFor="state">State</label>
-                      <input type="text" className="form-control" id="state" placeholder="Enter State"/>
-                </div>
+                    <label htmlFor="firstName">User Name</label>
+                    <input type="text" className="form-control" id="firstName" placeholder="Enter User Name"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword1">Password</label>
@@ -63,8 +25,14 @@ export default function SignUp() {
                 </div>
                 <button type="submit" className="btn btn-primary my-2">Submit</button>
             </form>
-        </div>
-    </div> 
+    <p className='mt-3'>Already Have an Account <span><NavLink to="/login">Log In</NavLink></span> </p>
+    </div>
+    <SIgn_img />
+    </section>
+    
+    </div>
+    
     </>
   )
 }
+

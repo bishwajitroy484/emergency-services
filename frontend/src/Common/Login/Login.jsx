@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
+import { NavLink } from 'react-router-dom'
 import SIgn_img from '../SIgn_img'
 
 const Login = () => {
 
   const history = useHistory();
   
-  const [adhar, setAdhar] = useState('')
-  const [mobile, setMobile] = useState('')
+  const [useName, setUserName] = useState('')
   const [password, setPassword] = useState('')
-  const [isLogin , setIsLogin] = useState(false)
-
-  useEffect(()=>{
-
-  },[isLogin])
 
    const submitForm = (e) =>{
     e.preventDefault()
-    const newEntry = {adhar, mobile }
+    const newEntry = {useName, password }
     localStorage.setItem('user-info',  JSON.stringify(newEntry));
-    if(true){
-      setIsLogin(true)
-    }
-    history.push('/')
+    history.push('/home')
   }
 
   return (
@@ -30,15 +22,11 @@ const Login = () => {
 <div className="container mt-3">
 <section className='d-flex justify-content-between'>
 <div className="left_data mt-3 p-3" style={{'width':'30em' }}>
-<h3 className='text-center col-lg-6'>Sign IN</h3>
+<h3>Log In</h3>
 <form action='' onSubmit={submitForm}>
   <div className="form-group">
-    <label htmlFor="adharNum">Adhar Number</label>
-    <input type="number" className="form-control" id="adharNum" value={adhar} onChange={(e)=> setAdhar(e.target.value)} placeholder="Enter Adhar"/>
-  </div>
-    <div className="form-group">
-    <label htmlFor="mobileNum">Mobile No.</label>
-    <input type="number" className="form-control" id="mobileNum" value={mobile} onChange={(e)=> setMobile(e.target.value)} placeholder="Enter Mobile Number"/>
+    <label htmlFor="userName">User Name</label>
+    <input type="text" className="form-control" id="userName" value={useName} onChange={(e)=> setUserName(e.target.value)} placeholder="Enter userName"/>
   </div>
   <div className="form-group">
     <label htmlFor="password">Password</label>
@@ -46,7 +34,7 @@ const Login = () => {
   </div>
   <button type="submit" className="btn btn-primary my-2">Submit</button>
 </form>
-<p className='mt-3'>Already Have an Account <span>SignIn</span> </p>
+<p className='mt-3'>Don't Have an Account <span><NavLink to="/signup">Sign Up</NavLink></span> </p>
 </div>
 <SIgn_img />
 </section>
