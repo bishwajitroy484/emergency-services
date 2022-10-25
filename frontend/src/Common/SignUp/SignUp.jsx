@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import './SignUp.css';
-import SIgn_img from '../SIgn_img'
+import SignUpImage from '../SignUpImage'
 
 export default function SignUp() {
   return (
@@ -27,7 +27,7 @@ export default function SignUp() {
             </form>
     <p className='mt-3'>Already Have an Account <span><NavLink to="/login">Log In</NavLink></span> </p>
     </div>
-    <SIgn_img />
+    <SignUpImage />
     </section>
     
     </div>

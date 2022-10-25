@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import { NavLink } from 'react-router-dom'
-import SIgn_img from '../SIgn_img'
+import SignUpImage from '../SignUpImage'
 
 const Login = () => {
 
@@ -36,7 +36,7 @@ const Login = () => {
 </form>
 <p className='mt-3'>Don't Have an Account <span><NavLink to="/signup">Sign Up</NavLink></span> </p>
 </div>
-<SIgn_img />
+<SignUpImage />
 </section>
 
 </div>

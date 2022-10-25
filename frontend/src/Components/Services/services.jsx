@@ -1,13 +1,32 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import SingleService from './singleService'
 
 export default function Services() {
+const [getRescueService, setRescueService] = useState([]);
 
-const servicesObj = [{id:1, name:'Name1'},{id:2, name:'Name2'},{id:3, name:'Name3'},{id:4, name:'Name4'},{id:5, name:'Name5'},{id:6, name:'Name6'}]
+const getServices = async () => {
+
+  const res = await fetch(`http://localhost:3001/getservices/`, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json"
+      }
+  });
+
+  const data = await res.json();
+
+  if (res.status === 422 || !data) console.log("error ");
+  else setRescueService(data)
+}
+
+useEffect(() => {
+  getServices();
+}, [])
+
   return (
     <>
-      <div className="serviceParentBlock" style={{'display': 'flex','flex-wrap': 'wrap', 'align-items': 'center', 'justify-content': 'space-between'}}>
-      {servicesObj.map( item => <SingleService name={item.name} />)}
+      <div className="serviceParentBlock" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+      {getRescueService.map( item => <SingleService name={item.name} />)}
       </div>
     </>
   )

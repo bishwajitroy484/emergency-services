@@ -9,7 +9,9 @@ export default function Home() {
   const [callInfo , setCallInfo] = useState([])
   const [emergencyStatus , setEmergencyStatus] = useState()
   const [callStatus , setCallStatus] = useState()
-  const [defaultValue, setDefaultValue] = useState(true)
+  const [defaultStatusValue, setDefaultStatusValue] = useState(true)
+  const [defaultEmergencyValue, setDefaultEmergencyValue] = useState(true)
+
   const [isDisableAction, setisDisableAction] = useState(true)
 
   const column = [
@@ -41,22 +43,25 @@ export default function Home() {
 
   const generateCall = () =>{
     setCallInfo([data[parseInt(Math.random() * 10)]])
-    setDefaultValue(true)
+    setDefaultStatusValue(true)
+    setDefaultEmergencyValue(true)
+    setisDisableAction(true)
   }
 
   const getAction = (action) =>{
-    setDefaultValue(false)
+    setDefaultStatusValue(false)
+    setDefaultEmergencyValue(false)
     console.log('Action ', action)
     console.log('emergencyStatus ', emergencyStatus)
     console.log('callStatus ', callStatus)
   }
 
-  const getEmergencyValue = (value) => setEmergencyStatus(value)
+  const getEmergencyValue = (value) => {setEmergencyStatus(value); setDefaultEmergencyValue(false)}
 
-  const getStatusValue = (value) =>  setCallStatus(value)
+  const getStatusValue = (value) =>  {setCallStatus(value); setDefaultStatusValue(false) }
   
   useEffect(()=>{
-    if(emergencyStatus && callStatus && callStatus !== 'select' &&  emergencyStatus !== 'select') setisDisableAction(false)
+    if(emergencyStatus && callStatus && callStatus !== 'DEFAULT' &&  emergencyStatus !== 'DEFAULT') setisDisableAction(false)
     else setisDisableAction(true)
   },[callStatus,emergencyStatus])
 
@@ -82,9 +87,9 @@ export default function Home() {
               <td>{val.callStart}</td>
               <td>{val.callEnd}</td>
               <td>{val.CallInfo}</td>
-              <td><Dropdown options={['Fire','Ambulance','Police','Mountain','Flood']} dropdownHandel={getEmergencyValue} defaultvalue={defaultValue}/></td>
+              <td><Dropdown options={['Fire','Ambulance','Police','Mountain','Flood']} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue}/></td>
               <td>{val.note}</td>
-              <td><Dropdown options={['successful Call','Call rerouted','Call interrupted','Call dropped']} dropdownHandel={getStatusValue} defaultvalue={defaultValue}/></td>
+              <td><Dropdown options={['Successful Call','Call Rerouted','Call Interrupted','Call Dropped']} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue}/></td>
               <td><Button name={"Submit"} btnAction={getAction} val={val} isDisable={isDisableAction}/></td>
             </tr>
           )

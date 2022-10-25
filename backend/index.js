@@ -1,10 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-// const mysqlConnection = require('./connection');
+const app = express();
+require("./connection");
+const router = require("./Routes/router");
+
 const port = 3001;
 
-const app = express();
-app.use(bodyParser.json());
+app.use(router);
 
 app.listen(port, () => {
     console.log('Server Start Running in ', port, '...')
