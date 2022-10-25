@@ -1,12 +1,12 @@
 import React from 'react'
-
 function Dropdown(props) {
+  console.log('defaultvalue ',  props.defaultvalue)
 
   return (
     <div>
-    <select className="form-select">
-      <option selected>select</option>
-      {props.options.map((val, index) => <option key={index} value={index}>{val}</option> )}
+    <select className="form-select" onChange={(event) =>props.dropdownHandel(event.target.value)}>
+      <option value='select' selected={props.defaultvalue}>select</option>
+      {props.options.map((val, index) => <option key={index} value={val}>{val}</option> )}
     </select>
     </div>
   )
