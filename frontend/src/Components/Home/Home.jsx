@@ -23,6 +23,44 @@ export default function Home() {
   const [showMsg, setShowMsg] = useState(false);
   const [mobile, setMobile] = useState('')
   const [endCall , setEndCall] = useState(true)
+  const [userDetails, setUserDetails] = useState({"Adhar":'',"phone_no":'',"city":'',"state":'',"street":'',"pincode":'',"house_no":''})
+  const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
+  const [getcallStatus, setGetCallStatus] = useState([]);
+  const [getRescueService, setRescueService] = useState([]);
+
+  const getServices = async () => {
+
+  const res = await fetch(`http://localhost:3001/getservices/`, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json"
+      }
+  });
+
+  const data = await res.json();
+
+  if (res.status === 422 || !data) console.log("error ");
+  else setRescueService(data)
+  }
+
+  const getCallStatus = async () => {
+
+    const res = await fetch(`http://localhost:3001/getcallstatus/`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+  
+    const data = await res.json();
+    if (res.status === 422 || !data) console.log("error ");
+    else setGetCallStatus(data)
+    }
+
+  useEffect(() => {
+    getServices();
+    getCallStatus();
+  }, [])
 
   useEffect(() => {
     let interval = null;
@@ -40,27 +78,10 @@ export default function Home() {
   }, [isActive]);
 
   useEffect(()=>{
-    // console.log('emergencyStatus ', emergencyStatus)
-    // console.log('callStatus ', callStatus)
-
+    console.log('endCall ', endCall)
     if(emergencyStatus && callStatus && callEndTime != "" && callStatus != 'select' && emergencyStatus!='select') setisDisableAction(false)
     else setisDisableAction(true)
-  },[callStatus,emergencyStatus, callEndTime])
-
-  // const data = [
-  //   { phoneNumber: 579799974, city: 'Delhi', callStart: "10:00:00", callEnd: "10:12:00", CallInfo: 'User&Operator Conversation 1 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 134787789, city: 'Noida', callStart: "11:00:00", callEnd: "11:12:00", CallInfo: 'User&Operator Conversation 2 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 676346789, city: 'Meerut', callStart: "12:00:00", callEnd: "12:12:00", CallInfo: 'User&Operator Conversation 3 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 564777283, city: 'Gurugram', callStart: "13:00:00", callEnd: "13:12:00", CallInfo: 'User&Operator Conversation 4 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 167456789, city: 'Karnal', callStart: "14:00:00", callEnd: "14:12:00", CallInfo: 'User&Operator Conversation 5 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 674992943, city: 'Banaras', callStart: "15:00:00", callEnd: "15:12:00", CallInfo: 'User&Operator Conversation 6 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 870707705, city: 'Lucknow', callStart: "16:00:00", callEnd: "16:12:00", CallInfo: 'User&Operator Conversation 7 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 894473103, city: 'Shimla', callStart: "17:00:00", callEnd: "17:12:00", CallInfo: 'User&Operator Conversation 8 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 674820032, city: 'Delhi', callStart: "18:00:00", callEnd: "18:12:00", CallInfo: 'User&Operator Conversation 9 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 667838772, city: 'Lucknow', callStart: "19:00:00", callEnd: "19:12:00", CallInfo: 'User&Operator Conversation 10 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 199388333, city: 'Manali', callStart: "20:00:00", callEnd: "20:12:00", CallInfo: 'User&Operator Conversation 11 ', emergency:'' ,note:'No Notes', status:'' },
-  //   { phoneNumber: 674882229, city: 'Dehradun', callStart: "21:00:00", callEnd: "21:12:00", CallInfo: 'User&Operator Conversation 12 ', emergency:'' ,note:'No Notes', status:'' },
-  // ]
+  },[callStatus,emergencyStatus, callEndTime,endCall])
 
  const handleStart = () => {
     setIsActive(true);
@@ -76,6 +97,7 @@ export default function Home() {
     setIsActive(false);
     setTime(0);
     setCallEndTime(moment().format('LTS'))
+    setEndCall(true)
   };
 
   const getAction = (e) =>{
@@ -87,20 +109,38 @@ export default function Home() {
     setisGetCallVisible(false)
     setMobile('');
     setEndCall(true)
-    console.log('Action ', e)
+    setUserDetails({"Adhar":'',"phone_no":'',"city":'',"state":'',"street":'',"pincode":'',"house_no":''})
+    setIsFormFieldDisable(false)
+
+    console.log('Submit Form ', e)
   }
 
   const getEmergencyValue = (value) => {setEmergencyStatus(value); setDefaultEmergencyValue(false)}
 
   const getStatusValue = (value) =>  {setCallStatus(value); setDefaultStatusValue(false) }
 
-  const getUserDetailBtn = () => {setCheckUserInfo(checkUserInDB(mobile)); setShowMsg(true);}
+  const getUserDetailBtn = async () => {
 
-  function checkUserInDB(userMobileNum){
-    const dummyMobile = [1,2,3,4];
-    if(dummyMobile.includes(parseInt(userMobileNum))) return true;
-    return false
+    try{
+      const res = await fetch(`http://localhost:3001/userdetails/${mobile}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json"}
+      });
+      const data = await res.json();
+      if (res.status === 422 || !data ) {
+        alert("Login Failed error !!...");
+      }else{
+        
+        if(data.length > 0) {setCheckUserInfo(true); setUserDetails(data[0]); setIsFormFieldDisable(true)}
+        else {setCheckUserInfo(false); setUserDetails({"Adhar":'',"phone_no":'',"city":'',"state":'',"street":'',"pincode":'',"house_no":''}); setIsFormFieldDisable(false);}
+      }
+
+    }catch(e){
+      alert('API ERROR ', e)
+    }
+    setShowMsg(true);
   }
+
 
   return (
 
@@ -132,43 +172,43 @@ export default function Home() {
           <div className="form-group row my-2">
             <label htmlFor="phoneNum" className="col-sm-4 col-form-label">Phone Number</label>
             <div className="col-sm-7">
-              <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number"/>
+              <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" value={userDetails.phone_no} disabled={isFormFieldDisable}/>
             </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="adhar" className="col-sm-4 col-form-label">Adhar Number</label>
               <div className="col-sm-7">
-                <input type="number" className="form-control" id="adhar" placeholder="Adhar Number"/>
+                <input type="number" className="form-control" id="adhar" placeholder="Adhar Number" value={userDetails.Adhar} />
               </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="houseNum" className="col-sm-4 col-form-label">House No.</label>
               <div className="col-sm-7">
-                <input type="text" className="form-control" id="houseNum" placeholder="House Number"/>
+                <input type="text" className="form-control" id="houseNum" placeholder="House Number" value={userDetails.house_no}/>
               </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="streeName" className="col-sm-4 col-form-label">Steer Name</label>
               <div className="col-sm-7">
-                <input type="text" className="form-control" id="streeName" placeholder="Street Name"/>
+                <input type="text" className="form-control" id="streeName" placeholder="Street Name" value={userDetails.street}/>
               </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="cityName" className="col-sm-4 col-form-label">City</label>
               <div className="col-sm-7">
-                <input type="text" className="form-control" id="cityName" placeholder="City"/>
+                <input type="text" className="form-control" id="cityName" placeholder="City" value={userDetails.city} />
               </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="pincode" className="col-sm-4 col-form-label">Pin Code</label>
               <div className="col-sm-7">
-                <input type="number" className="form-control" id="pincode" placeholder="Pin Code"/>
+                <input type="number" className="form-control" id="pincode" placeholder="Pin Code" value={userDetails.pincode}/>
               </div>
           </div>
           <div className="form-group row my-2">
             <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Required</label>
               <div className="col-sm-7">
-                <Dropdown options={['Fire','Ambulance','Police','Mountain','Flood']} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue}/>
+                <Dropdown options={getRescueService} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue}/>
               </div>
           </div>
           <div className="form-group row my-2">
@@ -181,7 +221,7 @@ export default function Home() {
           <div className="form-group row my-2">
             <label htmlFor="pincode" className="col-sm-4 col-form-label">Call Status</label>
               <div className="col-sm-7">
-               <Dropdown options={['Successful Call','Call Rerouted','Call Interrupted','Call Dropped']} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue}/>
+               <Dropdown options={getcallStatus} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue}/>
               </div>
           </div>
           <Button name={"Submit"} btnAction={getAction} val={'Data'} isDisable={isDisableAction}/>
@@ -194,13 +234,13 @@ export default function Home() {
         <div className="form-group row my-2">
           <label htmlFor="startTime" className="col-sm-3 col-form-label">Start Time :</label>
             <div className="col-sm-7">
-             <input type="text" readonly className="form-control" id="startTime" disabled value={callStartTime}/>
+             <input type="text" readOnly className="form-control" id="startTime" disabled value={callStartTime}/>
             </div>
         </div>
         <div className="form-group row my-2">
           <label htmlFor="endTime" className="col-sm-3 col-form-label">End Time :</label>
             <div className="col-sm-7">
-              <input type="text" readonly className="form-control" id="endTime" disabled value={callEndTime}/>
+              <input type="text" readOnly className="form-control" id="endTime" disabled value={callEndTime}/>
             </div>
         </div>
       </form>
@@ -210,30 +250,3 @@ export default function Home() {
     </div>
   )
 }
-
-
-// eslint-disable-next-line no-lone-blocks
-{/* <table className='table table-bordered' style={{tableLayout: 'fixed',width: '95%', marginLeft: '30px'}}>
-<thead>
-  <tr>
-  {column.map((val, key) => <th key={key}>{val.name}</th>)}
-  </tr>
-  </thead>
-  <tbody>
-  {callInfo.map((val, key) => {
-    return (
-      <tr key={key}>
-        <td>{val.phoneNumber}</td>
-        <td>{val.city}</td>
-        <td>{val.callStart}</td>
-        <td>{val.callEnd}</td>
-        <td>{val.CallInfo}</td>
-        <td><Dropdown options={['Fire','Ambulance','Police','Mountain','Flood']} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue}/></td>
-        <td>{val.note}</td>
-        <td><Dropdown options={['Successful Call','Call Rerouted','Call Interrupted','Call Dropped']} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue}/></td>
-        <td><Button name={"Submit"} btnAction={getAction} val={val} isDisable={isDisableAction}/></td>
-      </tr>
-    )
-  })}
-  </tbody>
-</table> */}
