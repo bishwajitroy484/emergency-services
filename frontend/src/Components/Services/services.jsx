@@ -26,7 +26,7 @@ useEffect(() => {
   return (
     <>
       <div className="serviceParentBlock" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-      {getRescueService.map( item => <SingleService name={item.name} />)}
+      {getRescueService.map( item => <SingleService name={item.name} key={item} />)}
       </div>
     </>
   )

@@ -2,8 +2,8 @@ const express = require("express");
 const router = new express.Router();
 const conn = require("../connection");
 
+//Fetch all the City Exist in the DB
 router.get("/getcity", (req, res) => {
-
     conn.query("SELECT * FROM city_master", (err, result) => {
         if (err) {
             res.status(422).json("nodata available");
@@ -13,8 +13,8 @@ router.get("/getcity", (req, res) => {
     })
 });
 
+//Fetch all the Services Exist in the DB
 router.get("/getservices", (req, res) => {
-
     conn.query("SELECT * FROM rescue_system_master", (err, result) => {
         if (err) {
             res.status(422).json("nodata available");
@@ -23,6 +23,51 @@ router.get("/getservices", (req, res) => {
         }
     })
 });
+
+//Check IF User Exist in the DB
+router.get("/user/:id", (req, res) => {
+    const { id } = req.params;
+    conn.query("SELECT * FROM operator_master WHERE username = ? ", id, (err, result) => {
+        if (err) {
+            res.status(422).json("error");
+        } else {
+            res.status(201).json(result);
+        }
+    })
+});
+
+router.post("/createuser", (req, res) => {
+    const { fName, lName, username, password } = req.body;
+    try {
+        conn.query("INSERT INTO operator_master SET ?", { fName, lName, username, password }, (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(req.body);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
+router.post("/auth", (req, res) => {
+    const { username, password } = req.body;
+    try {
+        conn.query("SELECT * FROM operator_master WHERE username = ? AND password = ? ", [username, password], (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
+
+
 //
 
 // user delete api
@@ -39,8 +84,6 @@ router.get("/getservices", (req, res) => {
 //         }
 //     })
 // });
-
-
 
 // get single user
 
@@ -60,7 +103,6 @@ router.get("/getservices", (req, res) => {
 
 // update users api
 
-
 // router.patch("/updateuser/:id",(req,res)=>{
 
 //     const {id} = req.params;
@@ -75,6 +117,7 @@ router.get("/getservices", (req, res) => {
 //         }
 //     })
 // });
+
 
 module.exports = router;
 

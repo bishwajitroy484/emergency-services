@@ -7,7 +7,7 @@ import Lifegaurd from '../../Asset/Rescue System/Lifegaurd_Rescue.webp'
 import Mountain from '../../Asset/Rescue System/Mountain_Rescue.jpg'
 import Police from '../../Asset/Rescue System/Police_Rescue.jpg'
 
-export default function SingleService({name}) {
+export default function SingleService({name, key}) {
 
     let imageLoader = null;
     switch(name){
@@ -22,7 +22,7 @@ export default function SingleService({name}) {
     }
 
   return (
-    <div  className='col'>
+    <div className='col' key={key}>
     <div className="card mx-3 mt-3">
         <img src={imageLoader} alt={imageLoader} className="card-img-top" style={{ height:'150px', ObjectFit:'cover'}}/>
         <div className='m-2 p-2' style={{minHeight:'80px'}}>

@@ -10,11 +10,25 @@ const Login = () => {
   const [useName, setUserName] = useState('')
   const [password, setPassword] = useState('')
 
-   const submitForm = (e) =>{
+   const submitForm = async (e) =>{
     e.preventDefault()
     const newEntry = {useName, password }
+
+    const res = await fetch("http://localhost:3001/auth/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json"},
+    body: JSON.stringify({ username:useName,password:password }),
+  });
+
+  const data = await res.json();
+  if (res.status === 422 || !data || data.length == 0) {
+    alert("Login Failed error !!...");
+  } else {
     localStorage.setItem('user-info',  JSON.stringify(newEntry));
     history.push('/home')
+    window.location.reload(false)
+  }
+
   }
 
   return (
