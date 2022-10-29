@@ -1,5 +1,6 @@
 import React from 'react'
 function Dropdown(props) {
+  console.log('props.defaultvalue ', props.defaultvalue)
   return (
     <div>
     <select className="form-select" onChange={(event) =>props.dropdownHandel(event.target.value)}>

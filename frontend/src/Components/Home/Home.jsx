@@ -78,10 +78,9 @@ export default function Home() {
   }, [isActive]);
 
   useEffect(()=>{
-    console.log('endCall ', endCall)
-    if(emergencyStatus && callStatus && callEndTime != "" && callStatus != 'select' && emergencyStatus!='select') setisDisableAction(false)
+    if(emergencyStatus && callStatus  && callStatus != 'select' && emergencyStatus!='select' && time == 0) setisDisableAction(false)
     else setisDisableAction(true)
-  },[callStatus,emergencyStatus, callEndTime,endCall])
+  },[callStatus,emergencyStatus,endCall,time])
 
  const handleStart = () => {
     setIsActive(true);
@@ -110,9 +109,13 @@ export default function Home() {
     setMobile('');
     setEndCall(true)
     setUserDetails({"Adhar":'',"phone_no":'',"city":'',"state":'',"street":'',"pincode":'',"house_no":''})
+    setCallStatus('select')
+    setEmergencyStatus('select')
     setIsFormFieldDisable(false)
 
+
     console.log('Submit Form ', e)
+
   }
 
   const getEmergencyValue = (value) => {setEmergencyStatus(value); setDefaultEmergencyValue(false)}
