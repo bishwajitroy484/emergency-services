@@ -74,6 +74,60 @@ router.post("/createuser", (req, res) => {
     }
 });
 
+router.post("/userlocation", (req, res) => {
+    const { street, pincode, house_no } = req.body;
+    try {
+        conn.query("INSERT INTO location_master SET ?", { street, pincode, house_no }, (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result.insertId);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
+router.post("/usermaster", (req, res) => {
+    const { Adhar, city_id, phone_no, location_id } = req.body;
+    try {
+        conn.query("INSERT INTO user_master SET ?", { Adhar, city_id, phone_no, location_id }, (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
+router.patch("/usermasterupdate/:id", (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    conn.query("UPDATE user_master SET ? WHERE phone_no = ? ", [data, id], (err, result) => {
+        if (err) {
+            res.status(422).json({ message: "error" });
+        } else {
+            res.status(201).json(result);
+        }
+    })
+});
+
+router.patch("/userlocationupdate/:id", (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    conn.query("UPDATE location_master SET ? WHERE location_id = ? ", [data, id], (err, result) => {
+        if (err) {
+            res.status(422).json({ message: "error" });
+        } else {
+            res.status(201).json(result);
+        }
+    })
+});
+
 //Login Auth ( Login Form )
 router.post("/auth", (req, res) => {
     const { username, password } = req.body;
@@ -94,7 +148,7 @@ router.post("/auth", (req, res) => {
 router.get("/userdetails/:id", (req, res) => {
     const { id } = req.params;
 
-    const query = `SELECT Adhar, phone_no, city_master.name as city,state_master.name as state, street,pincode,house_no FROM user_master
+    const query = `SELECT location_master.location_id,Adhar, phone_no, city_master.name as city,state_master.name as state, street,pincode,house_no FROM user_master
     JOIN city_master
       ON city_master.city_id = user_master.city_id
     JOIN location_master
@@ -110,58 +164,6 @@ router.get("/userdetails/:id", (req, res) => {
         }
     })
 });
-
-
-//
-
-// user delete api
-
-// router.delete("/deleteuser/:id",(req,res)=>{
-
-//     const {id} = req.params;
-
-//     conn.query("DELETE FROM users WHERE id = ? ",id,(err,result)=>{
-//         if(err){
-//             res.status(422).json("error");
-//         }else{
-//             res.status(201).json(result);
-//         }
-//     })
-// });
-
-// get single user
-
-// router.get("/induser/:id",(req,res)=>{
-
-//     const {id} = req.params;
-
-//     conn.query("SELECT * FROM users WHERE id = ? ",id,(err,result)=>{
-//         if(err){
-//             res.status(422).json("error");
-//         }else{
-//             res.status(201).json(result);
-//         }
-//     })
-// });
-
-
-// update users api
-
-// router.patch("/updateuser/:id",(req,res)=>{
-
-//     const {id} = req.params;
-
-//     const data = req.body;
-
-//     conn.query("UPDATE users SET ? WHERE id = ? ",[data,id],(err,result)=>{
-//         if(err){
-//             res.status(422).json({message:"error"});
-//         }else{
-//             res.status(201).json(result);
-//         }
-//     })
-// });
-
 
 module.exports = router;
 

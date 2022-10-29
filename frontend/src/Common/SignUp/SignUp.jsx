@@ -52,9 +52,7 @@ function mandatoryValidation(){
   else setSubmitBtn(true)
 }
 
-
 const submitSignUpForm = async (e) =>{
-  console.log('Submit Button Clicked')
   e.preventDefault()
 
   const res = await fetch("http://localhost:3001/createuser/", {
@@ -65,7 +63,6 @@ const submitSignUpForm = async (e) =>{
 
   const data = await res.json();
   if (res.status === 422 || !data) {
-    console.log("error ");
     alert("error");
 } else {
     history.push('/login')
