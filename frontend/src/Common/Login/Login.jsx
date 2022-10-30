@@ -19,7 +19,7 @@ const Login = () => {
     });
 
     const data = await res.json();
-    if (res.status === 422 || !data || data.length == 0) {
+    if (res.status === 422 || !data || data.length === 0) {
       alert("Login Failed error !!...");
     } else {
       localStorage.setItem('user-info', JSON.stringify(data[0]));

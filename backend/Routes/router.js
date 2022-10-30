@@ -74,6 +74,7 @@ router.post("/createuser", (req, res) => {
     }
 });
 
+//Create a new entry of user location
 router.post("/userlocation", (req, res) => {
     const { street, pincode, house_no } = req.body;
     try {
@@ -89,6 +90,7 @@ router.post("/userlocation", (req, res) => {
     }
 });
 
+//Create a new entry of call information
 router.post("/callinfo", (req, res) => {
     const { notes, phone_number, call_status_id, call_start_time, call_end_time, operator_id } = req.body;
     try {
@@ -104,10 +106,11 @@ router.post("/callinfo", (req, res) => {
     }
 });
 
+//Create a new entry of alert maker
 router.post("/alertmaker", (req, res) => {
-    const { call_id,action_id } = req.body;
+    const { call_id, action_id } = req.body;
     try {
-        conn.query("INSERT INTO alert_maker_master SET ?", { call_id,action_id }, (err, result) => {
+        conn.query("INSERT INTO alert_maker_master SET ?", { call_id, action_id }, (err, result) => {
             if (err) {
                 console.log("err" + err);
             } else {
@@ -119,6 +122,7 @@ router.post("/alertmaker", (req, res) => {
     }
 });
 
+//Create a new entry of user with location and city
 router.post("/usermaster", (req, res) => {
     const { Adhar, city_id, phone_no, location_id } = req.body;
     try {
@@ -134,6 +138,7 @@ router.post("/usermaster", (req, res) => {
     }
 });
 
+//Update the User master Entry
 router.patch("/usermasterupdate/:id", (req, res) => {
     const { id } = req.params;
     const data = req.body;
@@ -146,6 +151,7 @@ router.patch("/usermasterupdate/:id", (req, res) => {
     })
 });
 
+////Update the User Location Entry
 router.patch("/userlocationupdate/:id", (req, res) => {
     const { id } = req.params;
     const data = req.body;

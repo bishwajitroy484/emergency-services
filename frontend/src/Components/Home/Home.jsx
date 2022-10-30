@@ -13,63 +13,53 @@ export default function Home() {
   const [callStatus, setCallStatus] = useState()
   const [defaultStatusValue, setDefaultStatusValue] = useState(true)
   const [defaultEmergencyValue, setDefaultEmergencyValue] = useState(true)
-  const [isGetCallVisible, setisGetCallVisible] = useState(false)
+  const [isGetCallVisible, setIsGetCallVisible] = useState(false)
   const [callStartTime, setCallStartTime] = useState(null)
   const [callEndTime, setCallEndTime] = useState(null)
-  const [isDisableAction, setisDisableAction] = useState(true)
+  const [isDisableAction, setIsDisableAction] = useState(true)
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
   const [checkUserInfo, setCheckUserInfo] = useState(false);
   const [showMsg, setShowMsg] = useState(false);
   const [mobile, setMobile] = useState('')
   const [endCall, setEndCall] = useState(true)
-  const [startCall, setstartCall] = useState(true)
+  const [startCall, setStartCall] = useState(true)
   const [userDetails, setUserDetails] = useState({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', emergency: '', callstatus: '', callStart: '', callEnd: '', note: '', emergencyLocation: '' })
   const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
   const [getcallStatus, setGetCallStatus] = useState([]);
   const [getRescueService, setRescueService] = useState([]);
-  const [alertMsg, setAlertMsg] = useState('You have not login into the system to start receiving Calls !!..')
+  const [alertMsg, setAlertMsg] = useState('')
   const userLogininfo = localStorage.getItem('user-info');
 
   const getServices = async () => {
-
-    const res = await fetch(`http://localhost:3001/getservices/`, {
+    const getAllRescueServices = await fetch(`http://localhost:3001/getservices/`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: { "Content-Type": "application/json" }
     });
-
-    const data = await res.json();
-
-    if (res.status === 422 || !data) console.log("error ");
-    else setRescueService(data)
+    const receivedData = await getAllRescueServices.json();
+    if (getAllRescueServices.status === 422 || !receivedData) console.log("ERROR IN RETRIEVING RESCUE SERVICES");
+    else setRescueService(receivedData)
   }
-
   const getCallStatus = async () => {
-
-    const res = await fetch(`http://localhost:3001/getcallstatus/`, {
+    const getAllCallStatus = await fetch(`http://localhost:3001/getcallstatus/`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: { "Content-Type": "application/json" }
     });
-
-    const data = await res.json();
-    if (res.status === 422 || !data) console.log("error ");
-    else setGetCallStatus(data)
+    const receivedData = await getAllCallStatus.json();
+    if (getAllCallStatus.status === 422 || !receivedData) console.log("ERROR IN RETRIEVING CALL STATUS");
+    else setGetCallStatus(receivedData)
   }
 
   useEffect(() => {
     getServices();
     getCallStatus();
     if (userLogininfo) {
-      setstartCall(false)
-      setAlertMsg('')
+      setStartCall(false);
+      setAlertMsg('');
     } else {
-      setAlertMsg('You have not login into the system to start receiving Calls !!..')
+      setAlertMsg('You have not login into the system to start receiving calls !!..')
     }
-  }, [])
+  }, [userLogininfo])
 
   useEffect(() => {
     let interval = null;
@@ -78,25 +68,21 @@ export default function Home() {
       interval = setInterval(() => {
         setTime((time) => time + 10);
       }, 10);
-    } else {
-      clearInterval(interval);
-    }
-    return () => {
-      clearInterval(interval);
-    };
+    } else { clearInterval(interval); }
+    return () => { clearInterval(interval); };
   }, [isActive]);
 
   useEffect(() => {
-    if (emergencyStatus && callStatus && callStatus != 'select' && emergencyStatus != 'select' && time == 0) setisDisableAction(false)
-    else setisDisableAction(true)
+    if (emergencyStatus && callStatus && callStatus !== 'select' && emergencyStatus !== 'select' && time === 0) setIsDisableAction(false)
+    else setIsDisableAction(true)
   }, [callStatus, emergencyStatus, endCall, time])
 
   const handleStart = () => {
     setIsActive(true);
-    setisGetCallVisible(true)
+    setIsGetCallVisible(true)
     setDefaultStatusValue(true)
     setDefaultEmergencyValue(true)
-    setisDisableAction(true)
+    setIsDisableAction(true)
     setCallStartTime(moment().format("YYYY-MM-DD HH:mm:ss"))
     setEndCall(false)
   };
@@ -114,7 +100,7 @@ export default function Home() {
     setCallStartTime('')
     setCallEndTime('')
     setShowMsg(false);
-    setisGetCallVisible(false)
+    setIsGetCallVisible(false)
     setMobile('');
     setEndCall(true)
     setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '', emergencyLocation: '' })
@@ -122,78 +108,82 @@ export default function Home() {
     setEmergencyStatus('select')
     setIsFormFieldDisable(false)
 
-    console.log('Submit Form callStartTime => ', callStartTime)
-    console.log('Submit Form callEndTime => ', callEndTime)
-    console.log('Submit Form emergencyStatus => ', emergencyStatus)
-    console.log('Submit Form callStatus => ', callStatus)
-    console.log('Submit Form mobile => ', mobile)
-    console.log('Submit Form userDetails => ', userDetails)
+    // console.log('Submit Form callStartTime => ', callStartTime)
+    // console.log('Submit Form callEndTime => ', callEndTime)
+    // console.log('Submit Form emergencyStatus => ', emergencyStatus)
+    // console.log('Submit Form callStatus => ', callStatus)
+    // console.log('Submit Form mobile => ', mobile)
+    // console.log('Submit Form userDetails => ', userDetails)
 
+    //If the We get the User in DB then we have to perform PATCH Call to Update the Data if there is a change
     if (checkUserInfo) {
+      console.log('INSIDE THE PATCH CALL - UPDATE API ')
       const locationPatchRes = await fetch(`http://localhost:3001/userlocationupdate/${userDetails.location_id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ street: userDetails.street, pincode: userDetails.pincode, house_no: userDetails.house_no }),
       });
+      const receivedlocationPatchRes = await locationPatchRes.json();
 
       if (locationPatchRes.status === 422) {
-        alert("Location Update Login Failed error !!...");
+        console.log(`API FAILED TO UPDATE THE USER INFO IN "location_master" TABLE `)
       } else {
+        console.log(`API SUCCESSFULLY UPDATE THE USER INFO IN "location_master" TABLE `, receivedlocationPatchRes);
         const userPatchResponse = await fetch(`http://localhost:3001/usermasterupdate/${mobile}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ Adhar: userDetails.Adhar, city_id: 1 }),
         });
-        const data = await userPatchResponse.json();
+        const receiveduserPatchResponse = await userPatchResponse.json();
         if (userPatchResponse.status === 422) {
-          alert("User Login Failed error !!...");
+          console.log(`API FAILED TO UPDATE THE USER INFO IN "user_master" TABLE `);
         } else {
-          alert('PATCH SuccessFull Submit !!...', data)
+          console.log(`API SUCCESSFULLY UPDATE THE USER INFO IN "user_master" TABLE `, receiveduserPatchResponse);
         }
       }
     } else {
-      const res1 = await fetch("http://localhost:3001/userlocation/", {
+      //Else we have to create a new entry
+      console.log('INSIDE THE POST CALL - CREATE API ')
+      const locationPostRes = await fetch("http://localhost:3001/userlocation/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ street: userDetails.street, pincode: userDetails.pincode, house_no: userDetails.house_no }),
       });
-      const locationId = await res1.json();
+      const receivedlocationPostRes = await locationPostRes.json();
 
-      if (res1.status === 422) {
-        alert("Login Failed error !!...");
-      }
-      else {
-        let locid = (userDetails.location_id ? userDetails.location_id : locationId)
-        const res2 = await fetch("http://localhost:3001/usermaster/", {
+      if (locationPostRes.status === 422) {
+        console.log(`API FAILED TO CREATE THE USER INFO IN "location_master" TABLE `)
+      } else {
+        console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "location_master" TABLE`, receivedlocationPostRes)
+        const locationID = (userDetails.location_id ? userDetails.location_id : receivedlocationPostRes);
+        const userPostResponse = await fetch("http://localhost:3001/usermaster/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Adhar: userDetails.Adhar, city_id: 1, phone_no: mobile, location_id: locid }),
+          body: JSON.stringify({ Adhar: userDetails.Adhar, city_id: 1, phone_no: mobile, location_id: locationID }),
         });
-        const data = await res2.json();
 
-        if (res2.status === 422) {
-          alert("Login Failed error !!...");
+        const receiveduserPostResponse = await userPostResponse.json();
+        if (receiveduserPostResponse.status === 422) {
+          console.log(`API FAILED TO CREATE THE USER INFO IN "user_master" TABLE `)
         } else {
-          alert('SuccessFull Submit !!...', data)
+          console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "user_master" TABLE`, receiveduserPostResponse)
         }
       }
 
     }
-
     //Call Info Update....
+    const operatorId = JSON.parse(userLogininfo)
     const callInfo = await fetch("http://localhost:3001/callinfo/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes: userDetails.note, phone_number: mobile, call_status_id: callStatus, call_start_time: callStartTime, call_end_time: callEndTime, operator_id: userLogininfo.operator_id }),
+      body: JSON.stringify({ notes: userDetails.note, phone_number: mobile, call_status_id: callStatus, call_start_time: callStartTime, call_end_time: callEndTime, operator_id: operatorId.operator_id }),
     });
     const callInfoId = await callInfo.json();
 
     if (callInfo.status === 422) {
-      alert("Call Info Master Update Failed 422 Error !!...");
+      console.log(`API FAILED TO CREATE THE USER INFO IN "call_info_master" TABLE `)
     } else {
-
-      console.log('Successfull Call Info : ', callInfoId)
-
+      console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "call_info_master" TABLE`, callInfo)
       const alertMaker = await fetch("http://localhost:3001/alertmaker/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -201,15 +191,9 @@ export default function Home() {
       });
       const alertMakerData = await alertMaker.json();
 
-      if (callInfo.status === 422) {
-        alert("Alert Maker Update Failed 422 Error !!...");
-      } else {
-        console.log('Alert Maker Successfulll.. !!', alertMakerData)
-      }
+      if (callInfo.status === 422) console.log(`API FAILED TO CREATE THE USER INFO IN "alert_maker_master" TABLE `)
+      else console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "alert_maker_master" TABLE `, alertMakerData)
     }
-
-
-
   }
 
   const getEmergencyValue = (value) => { setEmergencyStatus(value); setDefaultEmergencyValue(false) }
@@ -217,28 +201,26 @@ export default function Home() {
   const getStatusValue = (value) => { setCallStatus(value); setDefaultStatusValue(false) }
 
   const getUserDetailBtn = async () => {
-
     try {
-      const res = await fetch(`http://localhost:3001/userdetails/${mobile}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      const data = await res.json();
-      if (res.status === 422 || !data) {
-        alert("Login Failed error !!...");
+      const checkUserExist = await fetch(`http://localhost:3001/userdetails/${mobile}`, { method: "GET", headers: { "Content-Type": "application/json" } });
+      const receivedData = await checkUserExist.json();
+      if (checkUserExist.status === 422 || !receivedData) {
+        console.log("API FAILED TO FETCH USER DETAILS");
       } else {
-        if (data.length > 0) {
+        if (receivedData.length > 0) {
+          console.log("API GET USER DETAILS IN DB");
           setCheckUserInfo(true);
-          setUserDetails(data[0]);
+          setUserDetails(receivedData[0]);
           setIsFormFieldDisable(true)
         } else {
+          console.log("API DID NOT GET USER DETAILS IN DB");
           setCheckUserInfo(false);
           setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '' });
           setIsFormFieldDisable(false);
         }
       }
     } catch (e) {
-      alert('API ERROR ', e)
+      alert('API "userdetails" ERROR ', e)
     }
     setShowMsg(true);
   }
