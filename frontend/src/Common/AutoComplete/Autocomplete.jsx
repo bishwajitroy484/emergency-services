@@ -1,26 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 
 function Autocomplete({ autoCompleteHandel, options }) {
-    console.log('options ', options)
+
+    const [onclearState, setOnClearState] = useState(false)
 
     const handleOnSelect = (item) => {
-        console.log(' handleOnSelect ', item)
+        setOnClearState(true)
         autoCompleteHandel(item)
     }
     const formatResult = (item) => {
-        console.log('formatResult ', item);
         return <span style={{ display: 'block', textAlign: 'left' }}>{item.name}</span>
     }
 
     return (
         <>
             <ReactSearchAutocomplete
+                onClear={onclearState}
                 items={options}
-                // onSearch={handleOnSearch}
-                // onHover={handleOnHover}
                 onSelect={handleOnSelect}
-                // onFocus={handleOnFocus}
                 autoFocus={false}
                 formatResult={formatResult}
                 showIcon={false}

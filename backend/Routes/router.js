@@ -4,7 +4,7 @@ const conn = require("../connection");
 
 //Fetch all the City Exist in the DB
 router.get("/getcity", (req, res) => {
-    conn.query("SELECT * FROM city_master", (err, result) => {
+    conn.query("SELECT city_id as id, name FROM city_master", (err, result) => {
         if (err) {
             res.status(422).json("nodata available");
         } else {
@@ -151,7 +151,7 @@ router.patch("/usermasterupdate/:id", (req, res) => {
     })
 });
 
-////Update the User Location Entry
+//Update the User Location Entry
 router.patch("/userlocationupdate/:id", (req, res) => {
     const { id } = req.params;
     const data = req.body;
@@ -202,5 +202,3 @@ router.get("/userdetails/:id", (req, res) => {
 });
 
 module.exports = router;
-
-
