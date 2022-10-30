@@ -23,10 +23,13 @@ export default function Home() {
   const [showMsg, setShowMsg] = useState(false);
   const [mobile, setMobile] = useState('')
   const [endCall, setEndCall] = useState(true)
+  const [startCall, setstartCall] = useState(true)
   const [userDetails, setUserDetails] = useState({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', emergency: '', callstatus: '', callStart: '', callEnd: '', note: '', emergencyLocation: '' })
   const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
   const [getcallStatus, setGetCallStatus] = useState([]);
   const [getRescueService, setRescueService] = useState([]);
+  const [alertMsg, setAlertMsg] = useState('You have not login into the system to start receiving Calls !!..')
+  const userLogininfo = localStorage.getItem('user-info');
 
   const getServices = async () => {
 
@@ -60,6 +63,12 @@ export default function Home() {
   useEffect(() => {
     getServices();
     getCallStatus();
+    if (userLogininfo) {
+      setstartCall(false)
+      setAlertMsg('')
+    } else {
+      setAlertMsg('You have not login into the system to start receiving Calls !!..')
+    }
   }, [])
 
   useEffect(() => {
@@ -175,7 +184,7 @@ export default function Home() {
     const callInfo = await fetch("http://localhost:3001/callinfo/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes: userDetails.note, phone_number: mobile, call_status_id: callStatus, call_start_time: callStartTime, call_end_time: callEndTime, operator_id: 1 }),
+      body: JSON.stringify({ notes: userDetails.note, phone_number: mobile, call_status_id: callStatus, call_start_time: callStartTime, call_end_time: callEndTime, operator_id: userLogininfo.operator_id }),
     });
     const callInfoId = await callInfo.json();
 
@@ -243,8 +252,9 @@ export default function Home() {
         <div className='col-3'>
 
           <div className="mt-3">
+            {startCall && <p style={{ color: 'red', fontWeight: 'bold', fontSize: '16px' }}>{alertMsg}</p>}
             <Timer time={time} />
-            <button className='btn btn-success btn-sm callButton' type="button" onClick={handleStart}><FiPhoneCall /> Call Received</button>
+            <button className='btn btn-success btn-sm callButton' type="button" disabled={startCall} onClick={handleStart}><FiPhoneCall /> Call Received</button>
             <button className='btn btn-danger btn-sm m-2 callButton' type="button" disabled={endCall} onClick={handleEnd} ><MdCallEnd /> Call End</button>
           </div>
 
@@ -255,7 +265,7 @@ export default function Home() {
             </div>
           }
 
-          {showMsg && <p>{checkUserInfo ? 'User Found' : 'User Not Found'}</p>}
+          {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found' : 'User Not Found'}</p>}
         </div>
 
         <div className='col-5 mt-3'>

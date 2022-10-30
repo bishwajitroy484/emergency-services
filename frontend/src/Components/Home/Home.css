@@ -1,17 +1,23 @@
-/* table {
-    border: 2px solid black;
-    width: 800px;
-    height: 200px;
-}
-
-th {
-    border-bottom: 1px solid black;
-}
-
-td {
-    text-align: center;
-} */
-
 .callButton {
     width: 135px;
+}
+
+.userFound {
+    font-size: 20px;
+    font-weight: bold;
+    color: green;
+}
+
+.userNotFound {
+    font-size: 20px;
+    font-weight: bold;
+    color: red;
+}
+
+.btn.disabled,
+.btn:disabled,
+fieldset:disabled .btn {
+    background-color: grey !important;
+    border-color: grey !important;
+    color: black !important
 }
