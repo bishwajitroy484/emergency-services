@@ -107,14 +107,7 @@ export default function Home() {
     setCallStatus('select')
     setEmergencyStatus('select')
     setIsFormFieldDisable(false)
-
-    // console.log('Submit Form callStartTime => ', callStartTime)
-    // console.log('Submit Form callEndTime => ', callEndTime)
-    // console.log('Submit Form emergencyStatus => ', emergencyStatus)
-    // console.log('Submit Form callStatus => ', callStatus)
-    // console.log('Submit Form mobile => ', mobile)
-    // console.log('Submit Form userDetails => ', userDetails)
-
+    
     //If the We get the User in DB then we have to perform PATCH Call to Update the Data if there is a change
     if (checkUserInfo) {
       console.log('INSIDE THE PATCH CALL - UPDATE API ')
