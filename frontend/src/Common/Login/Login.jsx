@@ -26,7 +26,6 @@ const Login = () => {
       history.push('/home')
       window.location.reload(false)
     }
-
   }
 
   return (
@@ -52,7 +51,6 @@ const Login = () => {
         </section>
 
       </div>
-
     </>
   )
 }

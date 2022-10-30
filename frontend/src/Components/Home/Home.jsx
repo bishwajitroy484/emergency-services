@@ -5,7 +5,10 @@ import Button from '../../Common/Button/Button'
 import Timer from '../../Common/StopWatch/Timer'
 import { FiPhoneCall } from 'react-icons/fi';
 import { MdCallEnd } from 'react-icons/md';
-import moment from 'moment'
+import moment from 'moment';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+import Autocomplete from '../../Common/AutoComplete/Autocomplete'
 
 export default function Home() {
 
@@ -28,31 +31,44 @@ export default function Home() {
   const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
   const [getcallStatus, setGetCallStatus] = useState([]);
   const [getRescueService, setRescueService] = useState([]);
-  const [alertMsg, setAlertMsg] = useState('')
+  const [getCity, setGetCity] = useState([]);
+  const [alertMsg, setAlertMsg] = useState('');
+  const [validateMobileNum, setValidateMobileNum] = useState(false);
+  const [cityVal, setCityVal] = useState('')
   const userLogininfo = localStorage.getItem('user-info');
 
   const getServices = async () => {
-    const getAllRescueServices = await fetch(`http://localhost:3001/getservices/`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
+    const getAllRescueServices = await fetch(`http://localhost:3001/getservices/`, { method: "GET", headers: { "Content-Type": "application/json" } });
     const receivedData = await getAllRescueServices.json();
     if (getAllRescueServices.status === 422 || !receivedData) console.log("ERROR IN RETRIEVING RESCUE SERVICES");
     else setRescueService(receivedData)
   }
   const getCallStatus = async () => {
-    const getAllCallStatus = await fetch(`http://localhost:3001/getcallstatus/`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
+    const getAllCallStatus = await fetch(`http://localhost:3001/getcallstatus/`, { method: "GET", headers: { "Content-Type": "application/json" } });
     const receivedData = await getAllCallStatus.json();
     if (getAllCallStatus.status === 422 || !receivedData) console.log("ERROR IN RETRIEVING CALL STATUS");
     else setGetCallStatus(receivedData)
   }
+  const getCityData = async () => {
+    const getAllCity = await fetch(`http://localhost:3001/getcity/`, { method: "GET", headers: { "Content-Type": "application/json" } });
+    const receivedData = await getAllCity.json();
+    if (getAllCity.status === 422 || !receivedData) console.log("ERROR IN RETRIEVING CITY");
+    else setGetCity(receivedData)
+  }
+  useEffect(() => {
+    const mobileNumValidate = () => {
+      if (mobile) {
+        if (mobile.toString().length === 10) setValidateMobileNum(false)
+        else setValidateMobileNum(true)
+      }
+    }
+    mobileNumValidate();
+  }, [mobile])
 
   useEffect(() => {
     getServices();
     getCallStatus();
+    getCityData();
     if (userLogininfo) {
       setStartCall(false);
       setAlertMsg('');
@@ -107,7 +123,7 @@ export default function Home() {
     setCallStatus('select')
     setEmergencyStatus('select')
     setIsFormFieldDisable(false)
-    
+
     //If the We get the User in DB then we have to perform PATCH Call to Update the Data if there is a change
     if (checkUserInfo) {
       console.log('INSIDE THE PATCH CALL - UPDATE API ')
@@ -119,7 +135,8 @@ export default function Home() {
       const receivedlocationPatchRes = await locationPatchRes.json();
 
       if (locationPatchRes.status === 422) {
-        console.log(`API FAILED TO UPDATE THE USER INFO IN "location_master" TABLE `)
+        console.log(`API FAILED TO UPDATE THE USER INFO IN "location_master" TABLE `);
+        toast.error('location_master API FAILED')
       } else {
         console.log(`API SUCCESSFULLY UPDATE THE USER INFO IN "location_master" TABLE `, receivedlocationPatchRes);
         const userPatchResponse = await fetch(`http://localhost:3001/usermasterupdate/${mobile}`, {
@@ -130,6 +147,7 @@ export default function Home() {
         const receiveduserPatchResponse = await userPatchResponse.json();
         if (userPatchResponse.status === 422) {
           console.log(`API FAILED TO UPDATE THE USER INFO IN "user_master" TABLE `);
+          toast.error('user_master API FAILED')
         } else {
           console.log(`API SUCCESSFULLY UPDATE THE USER INFO IN "user_master" TABLE `, receiveduserPatchResponse);
         }
@@ -145,19 +163,22 @@ export default function Home() {
       const receivedlocationPostRes = await locationPostRes.json();
 
       if (locationPostRes.status === 422) {
-        console.log(`API FAILED TO CREATE THE USER INFO IN "location_master" TABLE `)
+        console.log(`API FAILED TO CREATE THE USER INFO IN "location_master" TABLE `);
+        toast.error('location_master API FAILED')
+
       } else {
         console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "location_master" TABLE`, receivedlocationPostRes)
         const locationID = (userDetails.location_id ? userDetails.location_id : receivedlocationPostRes);
         const userPostResponse = await fetch("http://localhost:3001/usermaster/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Adhar: userDetails.Adhar, city_id: 1, phone_no: mobile, location_id: locationID }),
+          body: JSON.stringify({ Adhar: userDetails.Adhar, city_id: cityVal, phone_no: mobile, location_id: locationID }),
         });
 
         const receiveduserPostResponse = await userPostResponse.json();
         if (receiveduserPostResponse.status === 422) {
-          console.log(`API FAILED TO CREATE THE USER INFO IN "user_master" TABLE `)
+          console.log(`API FAILED TO CREATE THE USER INFO IN "user_master" TABLE `);
+          toast.error('user_master API FAILED');
         } else {
           console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "user_master" TABLE`, receiveduserPostResponse)
         }
@@ -174,7 +195,9 @@ export default function Home() {
     const callInfoId = await callInfo.json();
 
     if (callInfo.status === 422) {
-      console.log(`API FAILED TO CREATE THE USER INFO IN "call_info_master" TABLE `)
+      console.log(`API FAILED TO CREATE THE USER INFO IN "call_info_master" TABLE `);
+      toast.error('call_info_master API FAILED');
+
     } else {
       console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "call_info_master" TABLE`, callInfo)
       const alertMaker = await fetch("http://localhost:3001/alertmaker/", {
@@ -184,43 +207,51 @@ export default function Home() {
       });
       const alertMakerData = await alertMaker.json();
 
-      if (callInfo.status === 422) console.log(`API FAILED TO CREATE THE USER INFO IN "alert_maker_master" TABLE `)
-      else console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "alert_maker_master" TABLE `, alertMakerData)
+      if (callInfo.status === 422) {
+        console.log(`API FAILED TO CREATE THE USER INFO IN "alert_maker_master" TABLE `);
+        toast.error('alert_maker_master API FAILED');
+      } else {
+        console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "alert_maker_master" TABLE `, alertMakerData)
+      }
     }
+    toast.success('Form Submit Successfully !!...')
   }
 
   const getEmergencyValue = (value) => { setEmergencyStatus(value); setDefaultEmergencyValue(false) }
 
   const getStatusValue = (value) => { setCallStatus(value); setDefaultStatusValue(false) }
 
+  const getCityValue = (value) => { setCityVal(value.id); console.log('Vikcy ', value) }
+
   const getUserDetailBtn = async () => {
-    try {
-      const checkUserExist = await fetch(`http://localhost:3001/userdetails/${mobile}`, { method: "GET", headers: { "Content-Type": "application/json" } });
-      const receivedData = await checkUserExist.json();
-      if (checkUserExist.status === 422 || !receivedData) {
-        console.log("API FAILED TO FETCH USER DETAILS");
-      } else {
-        if (receivedData.length > 0) {
-          console.log("API GET USER DETAILS IN DB");
-          setCheckUserInfo(true);
-          setUserDetails(receivedData[0]);
-          setIsFormFieldDisable(true)
+
+    if (!validateMobileNum) {
+      try {
+        const checkUserExist = await fetch(`http://localhost:3001/userdetails/${mobile}`, { method: "GET", headers: { "Content-Type": "application/json" } });
+        const receivedData = await checkUserExist.json();
+        if (checkUserExist.status === 422 || !receivedData) {
+          console.log("API FAILED TO FETCH USER DETAILS");
         } else {
-          console.log("API DID NOT GET USER DETAILS IN DB");
-          setCheckUserInfo(false);
-          setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '' });
-          setIsFormFieldDisable(false);
+          if (receivedData.length > 0) {
+            console.log("API GET USER DETAILS IN DB");
+            setCheckUserInfo(true);
+            setUserDetails(receivedData[0]);
+            setIsFormFieldDisable(true)
+          } else {
+            console.log("API DID NOT GET USER DETAILS IN DB");
+            setCheckUserInfo(false);
+            setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '' });
+            setIsFormFieldDisable(false);
+          }
         }
+      } catch (e) {
+        alert('API "userdetails" ERROR ', e)
       }
-    } catch (e) {
-      alert('API "userdetails" ERROR ', e)
+      setShowMsg(true);
     }
-    setShowMsg(true);
   }
 
-
   return (
-
     <div className='container-fluid' style={{ height: '110vh' }}>
 
       <div className='row'>
@@ -236,11 +267,11 @@ export default function Home() {
           {isGetCallVisible &&
             <div className="input-group input-group-sm mb-3 ml-3" style={{ marginTop: '10px' }}>
               <input type="number" className="form-inline" placeholder='Enter Mobile Number' onChange={(e) => setMobile(e.target.value)} value={mobile} />
-              <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn}>Get Details</button>
+              <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn} disabled={validateMobileNum}>Get Details</button>
             </div>
           }
-
           {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found' : 'User Not Found'}</p>}
+          {validateMobileNum && <p className='userNotFound'>Enter Valid Mobile Number</p>}
         </div>
 
         <div className='col-5 mt-3'>
@@ -274,7 +305,8 @@ export default function Home() {
               <div className="form-group row my-2">
                 <label htmlFor="cityName" className="col-sm-4 col-form-label">City</label>
                 <div className="col-sm-7">
-                  <input type="text" className="form-control" id="cityName" placeholder="City" onChange={(e) => setUserDetails({ ...userDetails, city: e.target.value })} value={userDetails.city} />
+                  <Autocomplete autoCompleteHandel={getCityValue} options={getCity} />
+                  {/* <input type="text" className="form-control" id="cityName" placeholder="City" onChange={(e) => setUserDetails({ ...userDetails, city: e.target.value })} value={userDetails.city} /> */}
                 </div>
               </div>
               <div className="form-group row my-2">
@@ -330,6 +362,16 @@ export default function Home() {
         </div>
 
       </div>
+      <ToastContainer position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light" />
     </div>
   )
 }
