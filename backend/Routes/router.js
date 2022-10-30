@@ -89,6 +89,36 @@ router.post("/userlocation", (req, res) => {
     }
 });
 
+router.post("/callinfo", (req, res) => {
+    const { notes, phone_number, call_status_id, call_start_time, call_end_time, operator_id } = req.body;
+    try {
+        conn.query("INSERT INTO call_info_master SET ?", { notes, phone_number, call_status_id, call_start_time, call_end_time, operator_id }, (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result.insertId);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
+router.post("/alertmaker", (req, res) => {
+    const { call_id,action_id } = req.body;
+    try {
+        conn.query("INSERT INTO alert_maker_master SET ?", { call_id,action_id }, (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
 router.post("/usermaster", (req, res) => {
     const { Adhar, city_id, phone_no, location_id } = req.body;
     try {

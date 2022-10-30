@@ -23,12 +23,10 @@ export default function Home() {
   const [showMsg, setShowMsg] = useState(false);
   const [mobile, setMobile] = useState('')
   const [endCall, setEndCall] = useState(true)
-  const [userDetails, setUserDetails] = useState({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', emergency: '', callstatus: '', callStart: '', callEnd: '', note: '' })
+  const [userDetails, setUserDetails] = useState({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', emergency: '', callstatus: '', callStart: '', callEnd: '', note: '', emergencyLocation: '' })
   const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
   const [getcallStatus, setGetCallStatus] = useState([]);
   const [getRescueService, setRescueService] = useState([]);
-  const [notes, setNotes] = useState('');
-  // const [newUserEntry, setNewUserEntry] = useState({adhar:'',phone_no:'',city:'',state:'',pincode:'',house_no:'',street:'',emergency:'',callstatus:'',callStart:'',callEnd:'',note:''});
 
   const getServices = async () => {
 
@@ -90,14 +88,14 @@ export default function Home() {
     setDefaultStatusValue(true)
     setDefaultEmergencyValue(true)
     setisDisableAction(true)
-    setCallStartTime(moment().format('LTS'))
+    setCallStartTime(moment().format("YYYY-MM-DD HH:mm:ss"))
     setEndCall(false)
   };
 
   const handleEnd = () => {
     setIsActive(false);
     setTime(0);
-    setCallEndTime(moment().format('LTS'))
+    setCallEndTime(moment().format("YYYY-MM-DD HH:mm:ss"))
     setEndCall(true)
   };
 
@@ -110,7 +108,7 @@ export default function Home() {
     setisGetCallVisible(false)
     setMobile('');
     setEndCall(true)
-    setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '' })
+    setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '', emergencyLocation: '' })
     setCallStatus('select')
     setEmergencyStatus('select')
     setIsFormFieldDisable(false)
@@ -122,7 +120,6 @@ export default function Home() {
     console.log('Submit Form mobile => ', mobile)
     console.log('Submit Form userDetails => ', userDetails)
 
-    // 2 API Call...
     if (checkUserInfo) {
       const locationPatchRes = await fetch(`http://localhost:3001/userlocationupdate/${userDetails.location_id}`, {
         method: "PATCH",
@@ -130,7 +127,6 @@ export default function Home() {
         body: JSON.stringify({ street: userDetails.street, pincode: userDetails.pincode, house_no: userDetails.house_no }),
       });
 
-      const locationId = await locationPatchRes.json();
       if (locationPatchRes.status === 422) {
         alert("Location Update Login Failed error !!...");
       } else {
@@ -146,8 +142,6 @@ export default function Home() {
           alert('PATCH SuccessFull Submit !!...', data)
         }
       }
-
-
     } else {
       const res1 = await fetch("http://localhost:3001/userlocation/", {
         method: "POST",
@@ -176,6 +170,35 @@ export default function Home() {
       }
 
     }
+
+    //Call Info Update....
+    const callInfo = await fetch("http://localhost:3001/callinfo/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes: userDetails.note, phone_number: mobile, call_status_id: callStatus, call_start_time: callStartTime, call_end_time: callEndTime, operator_id: 1 }),
+    });
+    const callInfoId = await callInfo.json();
+
+    if (callInfo.status === 422) {
+      alert("Call Info Master Update Failed 422 Error !!...");
+    } else {
+
+      console.log('Successfull Call Info : ', callInfoId)
+
+      const alertMaker = await fetch("http://localhost:3001/alertmaker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ call_id: callInfoId, action_id: emergencyStatus }),
+      });
+      const alertMakerData = await alertMaker.json();
+
+      if (callInfo.status === 422) {
+        alert("Alert Maker Update Failed 422 Error !!...");
+      } else {
+        console.log('Alert Maker Successfulll.. !!', alertMakerData)
+      }
+    }
+
 
 
   }
@@ -214,7 +237,7 @@ export default function Home() {
 
   return (
 
-    <div className='container-fluid'>
+    <div className='container-fluid' style={{ height: '110vh' }}>
 
       <div className='row'>
         <div className='col-3'>
@@ -237,66 +260,71 @@ export default function Home() {
 
         <div className='col-5 mt-3'>
           <h3 style={{ textAlign: 'center' }}>User Information</h3>
-
-          <form>
-            <div className="form-group row my-2">
-              <label htmlFor="phoneNum" className="col-sm-4 col-form-label">Phone Number</label>
-              <div className="col-sm-7">
-                <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" value={mobile} disabled={isFormFieldDisable} />
+          <div style={{ marginTop: '2em', marginBottom: '5em' }}>
+            <form>
+              <div className="form-group row my-2">
+                <label htmlFor="phoneNum" className="col-sm-4 col-form-label">Phone Number</label>
+                <div className="col-sm-7">
+                  <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" value={mobile} disabled={isFormFieldDisable} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="adhar" className="col-sm-4 col-form-label">Adhar Number</label>
-              <div className="col-sm-7">
-                <input type="number" className="form-control" id="adhar" placeholder="Adhar Number" onChange={(e) => setUserDetails({ ...userDetails, Adhar: e.target.value })} value={userDetails.Adhar} />
+              <div className="form-group row my-2">
+                <label htmlFor="adhar" className="col-sm-4 col-form-label">Aadhar Number</label>
+                <div className="col-sm-7">
+                  <input type="number" className="form-control" id="adhar" placeholder="Adhar Number" onChange={(e) => setUserDetails({ ...userDetails, Adhar: e.target.value })} value={userDetails.Adhar} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="houseNum" className="col-sm-4 col-form-label">House No.</label>
-              <div className="col-sm-7">
-                <input type="text" className="form-control" id="houseNum" placeholder="House Number" onChange={(e) => setUserDetails({ ...userDetails, house_no: e.target.value })} value={userDetails.house_no} />
+              <div className="form-group row my-2">
+                <label htmlFor="houseNum" className="col-sm-4 col-form-label">House No.</label>
+                <div className="col-sm-7">
+                  <input type="text" className="form-control" id="houseNum" placeholder="House Number" onChange={(e) => setUserDetails({ ...userDetails, house_no: e.target.value })} value={userDetails.house_no} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="streeName" className="col-sm-4 col-form-label">Steer Name</label>
-              <div className="col-sm-7">
-                <input type="text" className="form-control" id="streeName" placeholder="Street Name" onChange={(e) => setUserDetails({ ...userDetails, street: e.target.value })} value={userDetails.street} />
+              <div className="form-group row my-2">
+                <label htmlFor="streeName" className="col-sm-4 col-form-label">Street Name</label>
+                <div className="col-sm-7">
+                  <input type="text" className="form-control" id="streeName" placeholder="Street Name" onChange={(e) => setUserDetails({ ...userDetails, street: e.target.value })} value={userDetails.street} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="cityName" className="col-sm-4 col-form-label">City</label>
-              <div className="col-sm-7">
-                <input type="text" className="form-control" id="cityName" placeholder="City" onChange={(e) => setUserDetails({ ...userDetails, city: e.target.value })} value={userDetails.city} />
+              <div className="form-group row my-2">
+                <label htmlFor="cityName" className="col-sm-4 col-form-label">City</label>
+                <div className="col-sm-7">
+                  <input type="text" className="form-control" id="cityName" placeholder="City" onChange={(e) => setUserDetails({ ...userDetails, city: e.target.value })} value={userDetails.city} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="pincode" className="col-sm-4 col-form-label">Pin Code</label>
-              <div className="col-sm-7">
-                <input type="number" className="form-control" id="pincode" placeholder="Pin Code" onChange={(e) => setUserDetails({ ...userDetails, pincode: e.target.value })} value={userDetails.pincode} />
+              <div className="form-group row my-2">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label">Pin Code</label>
+                <div className="col-sm-7">
+                  <input type="number" className="form-control" id="pincode" placeholder="Pin Code" onChange={(e) => setUserDetails({ ...userDetails, pincode: e.target.value })} value={userDetails.pincode} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Required</label>
-              <div className="col-sm-7">
-                <Dropdown options={getRescueService} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue} />
+              <div className="form-group row my-2">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Required</label>
+                <div className="col-sm-7">
+                  <Dropdown options={getRescueService} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue} />
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="notes" className="col-sm-4 col-form-label">Notes</label>
-              <div className="col-sm-7">
-                <textarea className="form-control" id="notes" rows="3" placeholder="Note" onChange={(e) => setUserDetails({ ...userDetails, note: e.target.value })} value={userDetails.note}></textarea>
-                {/* <input type="text" className="form-control" id="notes" placeholder="Note"/> */}
+              <div className="form-group row my-2">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Location</label>
+                <div className="col-sm-7">
+                  <textarea className="form-control" id="notes" rows="3" placeholder="Emergency Location" onChange={(e) => setUserDetails({ ...userDetails, emergencyLocation: e.target.value })} value={userDetails.emergencyLocation}></textarea>
+                </div>
               </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="pincode" className="col-sm-4 col-form-label">Call Status</label>
-              <div className="col-sm-7">
-                <Dropdown options={getcallStatus} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue} />
+              <div className="form-group row my-2">
+                <label htmlFor="notes" className="col-sm-4 col-form-label">Notes</label>
+                <div className="col-sm-7">
+                  <textarea className="form-control" id="notes" rows="3" placeholder="Note" onChange={(e) => setUserDetails({ ...userDetails, note: e.target.value })} value={userDetails.note}></textarea>
+                </div>
               </div>
-            </div>
-            <Button name={"Submit"} btnAction={getAction} isDisable={isDisableAction} />
-          </form>
-
+              <div className="form-group row my-2">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label">Call Status</label>
+                <div className="col-sm-7">
+                  <Dropdown options={getcallStatus} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue} />
+                </div>
+              </div>
+              <Button name={"Submit"} btnAction={getAction} isDisable={isDisableAction} />
+            </form>
+          </div>
         </div>
 
         <div className='col-4 mt-5'>
