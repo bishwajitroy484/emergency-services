@@ -201,4 +201,30 @@ router.get("/userdetails/:id", (req, res) => {
     })
 });
 
+
+//Login Auth ( Login Form )
+router.post("/rescuedata", (req, res) => {
+    const { rescue_id } = req.body;
+    try {
+        conn.query(`select cinfo.phone_number, uinfo.Adhar, loc.house_no, state.name as state, city.name as city, loc.pincode, cinfo.call_start_time, cinfo.call_end_time, cstatus.name as call_status, cinfo.notes, rescue.name as rescue_name
+        from alert_maker_master alert 
+        inner join call_info_master cinfo  on alert.call_id = cinfo.call_id 
+        inner join call_status_master cstatus on cstatus.id = cinfo.call_status_id 
+        inner join rescue_system_master rescue on rescue.rescue_id = alert.action_id 
+        inner join operator_master operator on operator.operator_id = cinfo.operator_id
+        inner join user_master uinfo on cinfo.phone_number = uinfo.phone_no
+        inner join city_master city on city.city_id = uinfo.city_id
+        inner join state_master state on state.state_id = city.state_id
+        inner join location_master loc on loc.location_id = uinfo.location_id WHERE rescue.rescue_id = ? `, [rescue_id], (err, result) => {
+            if (err) {
+                console.log("err" + err);
+            } else {
+                res.status(201).json(result);
+            }
+        })
+    } catch (error) {
+        res.status(422).json(error);
+    }
+});
+
 module.exports = router;

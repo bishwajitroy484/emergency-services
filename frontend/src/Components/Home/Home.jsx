@@ -214,7 +214,7 @@ export default function Home() {
         console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "alert_maker_master" TABLE `, alertMakerData)
       }
     }
-    toast.success('Form Submit Successfully !!...')
+    toast.success('Call Ended. Emergency Service has been initiated. Sms has been sent to the caller Mobile no.')
   }
 
   const getEmergencyValue = (value) => { setEmergencyStatus(value); setDefaultEmergencyValue(false) }
@@ -270,8 +270,8 @@ export default function Home() {
               <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn} disabled={validateMobileNum}>Get Details</button>
             </div>
           }
-          {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found' : 'User Not Found'}</p>}
-          {validateMobileNum && <p className='userNotFound'>Enter Valid Mobile Number</p>}
+          {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found !!' : 'User Not Found'}</p>}
+          {validateMobileNum && <p className='userNotFound'>Enter 10 Digits Valid Mobile Number</p>}
         </div>
 
         <div className='col-5 mt-3'>
@@ -281,7 +281,7 @@ export default function Home() {
               <div className="form-group row my-2">
                 <label htmlFor="phoneNum" className="col-sm-4 col-form-label">Phone Number</label>
                 <div className="col-sm-7">
-                  <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" value={mobile} disabled={isFormFieldDisable} />
+                  <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" disabled={true} value={mobile} />
                 </div>
               </div>
               <div className="form-group row my-2">
@@ -316,7 +316,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="form-group row my-2">
-                <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Required</label>
+                <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Services Required For</label>
                 <div className="col-sm-7">
                   <Dropdown options={getRescueService} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue} />
                 </div>

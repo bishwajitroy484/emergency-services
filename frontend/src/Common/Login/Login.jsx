@@ -45,7 +45,7 @@ const Login = () => {
               </div>
               <button type="submit" className="btn btn-primary my-2">Submit</button>
             </form>
-            <p className='mt-3'>Don't Have an Account <span><NavLink to="/signup">Sign Up</NavLink></span> </p>
+            <p className='mt-3'>Don't Have an Account? <span><NavLink to="/signup">Sign Up</NavLink></span> </p>
           </div>
           <SignUpImage />
         </section>
