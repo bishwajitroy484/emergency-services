@@ -362,7 +362,9 @@ export default function Home() {
         </div>
 
       </div>
-      <ToastContainer position="top-center"
+      <ToastContainer
+        position="top-center"
+        style={{ marginTop: '10px' }}
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
