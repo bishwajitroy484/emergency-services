@@ -28,7 +28,6 @@ export default function Home() {
   const [endCall, setEndCall] = useState(true)
   const [startCall, setStartCall] = useState(true)
   const [userDetails, setUserDetails] = useState({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', emergency: '', callstatus: '', callStart: '', callEnd: '', note: '', emergencyLocation: '' })
-  const [isFormFieldDisable, setIsFormFieldDisable] = useState(false)
   const [getcallStatus, setGetCallStatus] = useState([]);
   const [getRescueService, setRescueService] = useState([]);
   const [getCity, setGetCity] = useState([]);
@@ -122,8 +121,6 @@ export default function Home() {
     setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '', emergencyLocation: '' })
     setCallStatus('select')
     setEmergencyStatus('select')
-    setIsFormFieldDisable(false)
-
     //If the We get the User in DB then we have to perform PATCH Call to Update the Data if there is a change
     if (checkUserInfo) {
       console.log('INSIDE THE PATCH CALL - UPDATE API ')
@@ -236,12 +233,10 @@ export default function Home() {
             console.log("API GET USER DETAILS IN DB");
             setCheckUserInfo(true);
             setUserDetails(receivedData[0]);
-            setIsFormFieldDisable(true)
           } else {
             console.log("API DID NOT GET USER DETAILS IN DB");
             setCheckUserInfo(false);
             setUserDetails({ Adhar: '', phone_no: '', city: '', state: '', street: '', pincode: '', house_no: '', note: '' });
-            setIsFormFieldDisable(false);
           }
         }
       } catch (e) {
@@ -252,89 +247,108 @@ export default function Home() {
   }
 
   return (
-    <div className='container-fluid' style={{ height: '110vh' }}>
+    <div className='container-fluid'>
 
       <div className='row'>
-        <div className='col-3'>
-
-          <div className="mt-3">
-            {startCall && <p style={{ color: 'red', fontWeight: 'bold', fontSize: '16px' }}>{alertMsg}</p>}
-            <Timer time={time} />
-            <button className='btn btn-success btn-sm callButton' type="button" disabled={startCall} onClick={handleStart}><FiPhoneCall /> Call Received</button>
-            <button className='btn btn-danger btn-sm m-2 callButton' type="button" disabled={endCall} onClick={handleEnd} ><MdCallEnd /> Call End</button>
-          </div>
-
-          {isGetCallVisible &&
-            <div className="input-group input-group-sm mb-3 ml-3" style={{ marginTop: '10px' }}>
-              <input type="number" className="form-inline" placeholder='Enter Mobile Number' onChange={(e) => setMobile(e.target.value)} value={mobile} />
-              <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn} disabled={validateMobileNum}>Get Details</button>
+        <div className='col-4'>
+          <div className='mt-2 receiver'>
+            <div className="mt-3">
+              {startCall && <p style={{ color: 'red', fontWeight: 'bold', fontSize: '16px' }}>{alertMsg}</p>}
+              <div>
+                <form>
+                  <div className="form-group row my-2">
+                    <label htmlFor="startTime" className="col-sm-4 col-form-label">Start Time :</label>
+                    <div className="col-sm-7">
+                      <input type="text" readOnly className="form-control" id="startTime" disabled value={callStartTime} />
+                    </div>
+                  </div>
+                  <div className="form-group row my-2">
+                    <label htmlFor="endTime" className="col-sm-4 col-form-label">End Time :</label>
+                    <div className="col-sm-7">
+                      <input type="text" readOnly className="form-control" id="endTime" disabled value={callEndTime} />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <Timer time={time} />
+              <button className='btn btn-success btn-sm callButton' type="button" disabled={startCall} onClick={handleStart}><FiPhoneCall /> Call Received</button>
+              <button className='btn btn-danger btn-sm m-2 callButton' type="button" disabled={endCall} onClick={handleEnd} ><MdCallEnd /> Call End</button>
             </div>
-          }
-          {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found !!' : 'User Not Found'}</p>}
-          {validateMobileNum && <p className='userNotFound'>Enter 10 Digits Valid Mobile Number</p>}
+
+            {isGetCallVisible &&
+              <div className="input-group input-group-sm mb-3 ml-3" style={{ marginTop: '10px' }}>
+                <input type="number" className="form-inline" placeholder='Enter Mobile Number' onChange={(e) => setMobile(e.target.value)} value={mobile} />
+                <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn} disabled={validateMobileNum}>Get Details</button>
+              </div>
+            }
+            {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found !!' : 'User Not Found'}</p>}
+            {validateMobileNum && <p className='userNotFound' style={{ fontSize: 'initial' }}>Enter 10 Digits Valid Mobile Number</p>}
+
+          </div>
         </div>
 
-        <div className='col-5 mt-3'>
+        <div className="vl col-1"></div>
+
+        <div className='col-7 mt-2'>
           <h3 style={{ textAlign: 'center' }}>User Information</h3>
-          <div style={{ marginTop: '2em', marginBottom: '5em' }}>
+          <div style={{ marginTop: '1em', marginBottom: '5em' }}>
             <form>
-              <div className="form-group row my-2">
-                <label htmlFor="phoneNum" className="col-sm-4 col-form-label">Phone Number</label>
+              <div className="form-group row my-1">
+                <label htmlFor="phoneNum" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Phone Number</label>
                 <div className="col-sm-7">
                   <input type="number" className="form-control" id="phoneNum" placeholder="Phone Number" disabled={true} value={mobile} />
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="adhar" className="col-sm-4 col-form-label">Aadhar Number</label>
+              <div className="form-group row my-1">
+                <label htmlFor="adhar" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Aadhar Number</label>
                 <div className="col-sm-7">
                   <input type="number" className="form-control" id="adhar" placeholder="Adhar Number" onChange={(e) => setUserDetails({ ...userDetails, Adhar: e.target.value })} value={userDetails.Adhar} />
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="houseNum" className="col-sm-4 col-form-label">House No.</label>
+              <div className="form-group row my-1">
+                <label htmlFor="houseNum" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>House No.</label>
                 <div className="col-sm-7">
                   <input type="text" className="form-control" id="houseNum" placeholder="House Number" onChange={(e) => setUserDetails({ ...userDetails, house_no: e.target.value })} value={userDetails.house_no} />
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="streeName" className="col-sm-4 col-form-label">Street Name</label>
+              <div className="form-group row my-1">
+                <label htmlFor="streeName" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Street Name</label>
                 <div className="col-sm-7">
                   <input type="text" className="form-control" id="streeName" placeholder="Street Name" onChange={(e) => setUserDetails({ ...userDetails, street: e.target.value })} value={userDetails.street} />
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="cityName" className="col-sm-4 col-form-label">City</label>
+              <div className="form-group row my-1">
+                <label htmlFor="cityName" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>City</label>
                 <div className="col-sm-7">
                   <Autocomplete autoCompleteHandel={getCityValue} options={getCity} />
-                  {/* <input type="text" className="form-control" id="cityName" placeholder="City" onChange={(e) => setUserDetails({ ...userDetails, city: e.target.value })} value={userDetails.city} /> */}
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="pincode" className="col-sm-4 col-form-label">Pin Code</label>
+              <div className="form-group row my-1">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Pin Code</label>
                 <div className="col-sm-7">
                   <input type="number" className="form-control" id="pincode" placeholder="Pin Code" onChange={(e) => setUserDetails({ ...userDetails, pincode: e.target.value })} value={userDetails.pincode} />
                 </div>
               </div>
-              <div className="form-group row my-2">
+              <div className="form-group row my-1">
                 <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Services Required For</label>
                 <div className="col-sm-7">
                   <Dropdown options={getRescueService} dropdownHandel={getEmergencyValue} defaultvalue={defaultEmergencyValue} />
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="pincode" className="col-sm-4 col-form-label">Emergency Location</label>
+              <div className="form-group row my-1">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Emergency Location</label>
                 <div className="col-sm-7">
-                  <textarea className="form-control" id="notes" rows="3" placeholder="Emergency Location" onChange={(e) => setUserDetails({ ...userDetails, emergencyLocation: e.target.value })} value={userDetails.emergencyLocation}></textarea>
+                  <textarea className="form-control" id="notes" rows="2 " placeholder="Emergency Location" onChange={(e) => setUserDetails({ ...userDetails, emergencyLocation: e.target.value })} value={userDetails.emergencyLocation}></textarea>
                 </div>
               </div>
-              <div className="form-group row my-2">
+              <div className="form-group row my-1">
                 <label htmlFor="notes" className="col-sm-4 col-form-label">Notes</label>
                 <div className="col-sm-7">
-                  <textarea className="form-control" id="notes" rows="3" placeholder="Note" onChange={(e) => setUserDetails({ ...userDetails, note: e.target.value })} value={userDetails.note}></textarea>
+                  <textarea className="form-control" id="notes" rows="2" placeholder="Note" onChange={(e) => setUserDetails({ ...userDetails, note: e.target.value })} value={userDetails.note}></textarea>
                 </div>
               </div>
-              <div className="form-group row my-2">
-                <label htmlFor="pincode" className="col-sm-4 col-form-label">Call Status</label>
+              <div className="form-group row my-1">
+                <label htmlFor="pincode" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>Call Status</label>
                 <div className="col-sm-7">
                   <Dropdown options={getcallStatus} dropdownHandel={getStatusValue} defaultvalue={defaultStatusValue} />
                 </div>
@@ -343,24 +357,6 @@ export default function Home() {
             </form>
           </div>
         </div>
-
-        <div className='col-4 mt-5'>
-          <form>
-            <div className="form-group row my-2">
-              <label htmlFor="startTime" className="col-sm-3 col-form-label">Start Time :</label>
-              <div className="col-sm-7">
-                <input type="text" readOnly className="form-control" id="startTime" disabled value={callStartTime} />
-              </div>
-            </div>
-            <div className="form-group row my-2">
-              <label htmlFor="endTime" className="col-sm-3 col-form-label">End Time :</label>
-              <div className="col-sm-7">
-                <input type="text" readOnly className="form-control" id="endTime" disabled value={callEndTime} />
-              </div>
-            </div>
-          </form>
-        </div>
-
       </div>
       <ToastContainer
         position="top-center"

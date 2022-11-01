@@ -33,17 +33,14 @@ export default function Services() {
 
   const getServiceClicked = (val) => {
     setGridData(val)
-    console.log('AAya ? ', val)
   }
-
-  console.log('getRescueService ', getRescueService)
 
   return (
     <>
       <div className="serviceParentBlock mb-5" style={{ display: 'flex', justifyContent: 'space-between' }}>
         {getRescueService.map(item => <SingleService name={item.name} keyItem={item.id} getServiceClicked={getServiceClicked} btndisable={btndisable} />)}
       </div>
-      {showGrid && <ServiceData showData={gridData} loginOperator={userLogininfo} />}
+      {showGrid && <ServiceData showData={gridData} />}
     </>
   )
 }

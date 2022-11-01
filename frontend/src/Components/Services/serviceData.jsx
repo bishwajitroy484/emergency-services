@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react'
 
-export default function ServiceData({ showData, loginOperator }) {
-    console.log('ServiceData showData', showData)
-    console.log('ServiceData loginOperator', loginOperator)
+export default function ServiceData({ showData }) {
+    const [noRecord, setNoRecord] = useState(false)
 
-    const tableHeaders = ['Phone Number', 'Aadhar No.', 'House No.', 'State', 'City', 'Pin Code', 'Call Start', 'Call End', 'Call Status', 'Notes', 'Services'];
+    const tableHeaders = ['Phone Number', 'Aadhar No.', 'House No.', 'City', 'State', 'Pin Code', 'Call Start', 'Call End', 'Call Status', 'Notes', 'Services'];
 
     const [getRescueServiceData, setRescueServiceData] = useState([]);
 
     const getRescueData = async () => {
-        const operatorId = JSON.parse(loginOperator)
-
-        console.log('In Func ServiceData showData', showData)
-        console.log('In Func ServiceData loginOperator', loginOperator)
-
         const res = await fetch(`http://localhost:3001/rescuedata/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rescue_id: 7 }),
+            body: JSON.stringify({ rescue_id: showData }),
         });
         const data = await res.json();
         if (res.status === 422 || !data) console.log("error ");
@@ -26,7 +20,11 @@ export default function ServiceData({ showData, loginOperator }) {
 
     useEffect(() => {
         getRescueData();
-    }, [])
+        if (showData != "") setNoRecord(true)
+    }, [showData])
+
+    console.log('ServiceData noRecord', noRecord)
+    console.log('getRescueServiceData.length ', getRescueServiceData.length)
 
     return (
         <>
@@ -38,14 +36,14 @@ export default function ServiceData({ showData, loginOperator }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {getRescueServiceData.map((val, index) => {
+                        {getRescueServiceData.length > 0 && getRescueServiceData.map((val, index) => {
                             return (<React.Fragment>
                                 <tr key={index}>
                                     <td>{val.phone_number}</td>
                                     <td>{val.Adhar}</td>
                                     <td>{val.house_no}</td>
-                                    <td>{val.state}</td>
                                     <td>{val.city}</td>
+                                    <td>{val.state}</td>
                                     <td>{val.pincode}</td>
                                     <td>{val.call_start_time}</td>
                                     <td>{val.call_end_time}</td>
@@ -55,6 +53,7 @@ export default function ServiceData({ showData, loginOperator }) {
                                 </tr>
                             </React.Fragment>)
                         })}
+                        {getRescueServiceData.length === 0 && noRecord && <tr colspan="11" style={{ color: 'red' }}>No RECORD FOUND</tr>}
                     </tbody>
                 </table>
             </div>
