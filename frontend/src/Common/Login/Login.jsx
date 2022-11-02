@@ -9,6 +9,7 @@ const Login = () => {
 
   const [useName, setUserName] = useState('')
   const [password, setPassword] = useState('')
+  const [errmsg, setErrmsg] = useState('')
 
   const submitForm = async (e) => {
     e.preventDefault()
@@ -20,7 +21,7 @@ const Login = () => {
 
     const data = await res.json();
     if (res.status === 422 || !data || data.length === 0) {
-      alert("Login Failed error !!...");
+      setErrmsg('Invalid Username or Password !!')
     } else {
       localStorage.setItem('user-info', JSON.stringify(data[0]));
       history.push('/home')
@@ -33,6 +34,7 @@ const Login = () => {
       <div className="container mt-3">
         <section className='d-flex justify-content-between'>
           <div className="left_data mt-3 p-3" style={{ 'width': '30em' }}>
+            {errmsg && <p style={{ color: 'red', fontWeight: 'initial', fontSize: '16px' }}>{errmsg}</p>}
             <h3>Log In</h3>
             <form action='' onSubmit={submitForm}>
               <div className="form-group">
