@@ -26,7 +26,7 @@ export default function SingleService(props) {
       <div className="card mx-3 mt-3" style={{ boxShadow: '0px 0px 4px 2px' }}>
         <img src={imageLoader} alt={imageLoader} className="card-img-top" style={{ height: '150px', ObjectFit: 'cover' }} />
         <div className='m-2 p-2' style={{ minHeight: '112px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <p className='font-weight-bold'>{serviceName}</p>
+          <p style={{ fontWeight: 'bold' }}>{serviceName}</p>
           <button type="button" className='btn btn-sm btn-primary' disabled={props.btndisable} onClick={() => props.getServiceClicked(props.keyItem)}>Get Details</button>
         </div>
       </div>

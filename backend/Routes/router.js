@@ -206,7 +206,7 @@ router.get("/userdetails/:id", (req, res) => {
 router.post("/rescuedata", (req, res) => {
     const { rescue_id } = req.body;
     try {
-        conn.query(`select cinfo.phone_number, uinfo.Adhar, loc.house_no, state.name as state, city.name as city, loc.pincode, cinfo.call_start_time, cinfo.call_end_time, cstatus.name as call_status, cinfo.notes, rescue.name as rescue_name
+        conn.query(`select operator.username as operator_name ,cinfo.phone_number, uinfo.Adhar, loc.house_no, state.name as state, city.name as city, loc.pincode, cinfo.call_start_time, cinfo.call_end_time, cstatus.name as call_status, cinfo.notes, rescue.name as rescue_name
         from alert_maker_master alert 
         inner join call_info_master cinfo  on alert.call_id = cinfo.call_id 
         inner join call_status_master cstatus on cstatus.id = cinfo.call_status_id 

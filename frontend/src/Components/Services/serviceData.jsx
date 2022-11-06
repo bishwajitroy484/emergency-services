@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment';
 
 export default function ServiceData({ showData }) {
     const [noRecord, setNoRecord] = useState(false)
 
-    const tableHeaders = ['Phone Number', 'Aadhar No.', 'House No.', 'City', 'State', 'Pin Code', 'Call Start', 'Call End', 'Call Status', 'Notes', 'Services'];
+    const tableHeaders = ['Operator', 'Phone Number', 'Aadhar No.', 'House No.', 'City', 'State', 'Pin Code', 'Call Start', 'Call End', 'Call Status', 'Notes', 'Services'];
 
     const [getRescueServiceData, setRescueServiceData] = useState([]);
 
@@ -39,14 +40,15 @@ export default function ServiceData({ showData }) {
                         {getRescueServiceData.length > 0 && getRescueServiceData.map((val, index) => {
                             return (<React.Fragment>
                                 <tr key={index}>
+                                    <td>{val.operator_name}</td>
                                     <td>{val.phone_number}</td>
                                     <td>{val.Adhar}</td>
                                     <td>{val.house_no}</td>
                                     <td>{val.city}</td>
                                     <td>{val.state}</td>
                                     <td>{val.pincode}</td>
-                                    <td>{val.call_start_time}</td>
-                                    <td>{val.call_end_time}</td>
+                                    <td>{moment(val.call_start_time).format("DD-MMM-YYYY HH:mm:ss")}</td>
+                                    <td>{moment(val.call_end_time).format("DD-MMM-YYYY HH:mm:ss")}</td>
                                     <td>{val.call_status}</td>
                                     <td>{val.notes}</td>
                                     <td>{val.rescue_name}</td>

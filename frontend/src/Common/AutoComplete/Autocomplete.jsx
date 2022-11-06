@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 
-function Autocomplete({ autoCompleteHandel, options }) {
+function Autocomplete({ autoCompleteHandel, options, formStatus }) {
 
-    const [onclearState, setOnClearState] = useState(false)
+    const [onclearState, setOnClearState] = useState(false);
+    console.log('formStatus ', formStatus);
+
+    useEffect(() => {
+        if (formStatus) setOnClearState(true)
+    }, [formStatus])
 
     const handleOnSelect = (item) => {
         setOnClearState(true)

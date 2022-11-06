@@ -34,6 +34,7 @@ export default function Home() {
   const [alertMsg, setAlertMsg] = useState('');
   const [validateMobileNum, setValidateMobileNum] = useState(false);
   const [cityVal, setCityVal] = useState('')
+  const [formStatus, setFormStatus] = useState(false);
   const userLogininfo = localStorage.getItem('user-info');
 
   const getServices = async () => {
@@ -99,7 +100,8 @@ export default function Home() {
     setDefaultEmergencyValue(true)
     setIsDisableAction(true)
     setCallStartTime(moment().format("YYYY-MM-DD HH:mm:ss"))
-    setEndCall(false)
+    setEndCall(false);
+    setFormStatus(false)
   };
 
   const handleEnd = () => {
@@ -211,7 +213,8 @@ export default function Home() {
         console.log(`API SUCCESSFULLY CREATE THE USER INFO IN "alert_maker_master" TABLE `, alertMakerData)
       }
     }
-    toast.success('Call Ended. Emergency Service has been initiated. Sms has been sent to the caller Mobile no.')
+    setFormStatus(true);
+    toast.success('Call Ended. Emergency Service has been initiated. Sms has been sent to the caller Mobile no.');
   }
 
   const getEmergencyValue = (value) => { setEmergencyStatus(value); setDefaultEmergencyValue(false) }
@@ -281,7 +284,7 @@ export default function Home() {
                 <button className='btn btn-primary' style={{ width: '91px' }} onClick={getUserDetailBtn} disabled={validateMobileNum}>Get Details</button>
               </div>
             }
-            {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found !!' : 'User Not Found'}</p>}
+            {showMsg && <p className={checkUserInfo ? 'userFound' : 'userNotFound'}>{checkUserInfo ? 'User Found !!' : 'User Not Found !!'}</p>}
             {validateMobileNum && <p className='userNotFound' style={{ fontSize: 'initial' }}>Enter 10 Digits Valid Mobile Number</p>}
 
           </div>
@@ -320,7 +323,7 @@ export default function Home() {
               <div className="form-group row my-1">
                 <label htmlFor="cityName" className="col-sm-4 col-form-label"><span className='mandatory'>*</span>City</label>
                 <div className="col-sm-7">
-                  <Autocomplete autoCompleteHandel={getCityValue} options={getCity} />
+                  <Autocomplete autoCompleteHandel={getCityValue} options={getCity} formStatus={formStatus} />
                 </div>
               </div>
               <div className="form-group row my-1">
